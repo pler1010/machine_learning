@@ -1,2 +1,2 @@
 # machine_learning
-The final homework for machine learning.
+The final project for machine learning.
