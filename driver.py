@@ -8,7 +8,7 @@ datapath = os.path.join(root,'./data')
 
 parser = argparse.ArgumentParser(description="根据参数执行不同功能")
 parser.add_argument('--mode', '-m', required=True, 
-                choices=['pretreat', 'stat_select', 'evalate'],
+                choices=['pretreat', 'stat_select', 'evaluate'],
                 help='执行内容')
 parser.add_argument('--dimension', '-d', help='选择的维度')
 args = parser.parse_args()
@@ -22,8 +22,8 @@ def main():
         else:
             print('-d is needed')
         
-    elif args.mode == 'evalate':
-        subprocess.run(["python", "evalate.py"])
+    elif args.mode == 'evaluate':
+        subprocess.run(["python", "./src/evaluate.py", datapath])
     else:
         print(f"未知模式: {args.mode}")
 

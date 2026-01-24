@@ -235,15 +235,15 @@ print('\n图形已保存为: data_filtering_analysis.png')
 plt.show()
 print()
 
-temp_list = []
-for i in range(m):
-    if m_list[i]:
-        temp_list.append((i,np.mean(X[:,i]>0)))
-temp_list.sort(key=lambda x:x[1],reverse=True)
-for i in range(m):
-    m_list[i]=False
-for i in range(500):
-    m_list[temp_list[i][0]]=True
+# temp_list = []
+# for i in range(m):
+#     if m_list[i]:
+#         temp_list.append((i,np.mean(X[:,i]>0)))
+# temp_list.sort(key=lambda x:x[1],reverse=True)
+# for i in range(m):
+#     m_list[i]=False
+# for i in range(500,700):
+#     m_list[temp_list[i][0]]=True
 
 with open(f"{filepath}/clean_data.txt","w") as f:
     for i in range(m):
