@@ -18,7 +18,7 @@ def main():
         subprocess.run(["python", "./src/pretreat.py", datapath])
     elif args.mode == 'stat_select':
         if args.dimension:
-            subprocess.run(["python", "stat_select.py"])
+            subprocess.run(["python", "./src/stat_select.py", datapath, args.dimension])
         else:
             print('-d is needed')
         

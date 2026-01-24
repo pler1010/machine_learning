@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score, classification_report, jaccard_score
 
 # 读取和准备数据
 filepath=sys.argv[1]
-df = pd.read_csv(f'{filepath}/clean_data.txt')
+df = pd.read_csv(f'{filepath}/selected_data.txt')
 X = df.iloc[:, :-1].values
 y = LabelEncoder().fit_transform(df['type'])
 
