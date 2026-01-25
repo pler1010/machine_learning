@@ -1,6 +1,7 @@
 import sys
 import pandas as pd
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy.stats import ranksums
 
@@ -15,6 +16,7 @@ label_col = df.columns[-1]
 # 获取所有亚型
 subtypes = df[label_col].unique()
 selected_features = set()
+list_features = []
 
 # 对每个亚型进行一对多比较
 for subtype in subtypes:
@@ -44,7 +46,27 @@ for subtype in subtypes:
     # 按log2FC绝对值排序，取前k个
     result_df['abs_log2FC'] = np.abs(result_df['log2FC'])
     top_genes = result_df.sort_values('abs_log2FC', ascending=False).head(k)
+
+    top3_genes=top_genes.head(3)['Gene']
+    heatmap_df = df.groupby(label_col)[top3_genes].mean()
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(
+        heatmap_df,
+        annot=True,
+        fmt='.3f',
+        cmap='coolwarm',
+        center=heatmap_df.values.mean(),  # 以平均值为中心
+        square=True,  # 使单元格为正方形
+        cbar_kws={'shrink': 0.8}
+    )
+    plt.title('Gene Expression Heatmap')
+    plt.xlabel('Genes')
+    plt.ylabel('Subtypes')
+    plt.tight_layout()
+    # plt.show()
+    plt.savefig(f'{filepath}/../fig/heatmap_{subtype}.png', dpi=300, bbox_inches='tight')
     
+    list_features.append(top_genes)
     selected_features.update(top_genes['Gene'])
     
     # 绘制火山图
@@ -72,7 +94,29 @@ for subtype in subtypes:
     plt.savefig(f'{filepath}/../fig/volcano_{subtype}.png', dpi=300, bbox_inches='tight')
     plt.close()
 
-# 保存选择的数据
+# 用于绘制venn图
+def calc_size(x):
+    res = set(list_features[x[0]].index)
+    for idx in x[1:]:
+        res = res.intersection(set(list_features[idx].index))
+    return len(res)
+
 print('selected_counts:',len(selected_features))
+print('0:',calc_size([0]))
+print('1:',calc_size([1]))
+print('2:',calc_size([2]))
+print('3:',calc_size([3]))
+print('01:',calc_size([0,1]))
+print('02:',calc_size([0,2]))
+print('03:',calc_size([0,3]))
+print('12:',calc_size([1,2]))
+print('13:',calc_size([1,3]))
+print('23:',calc_size([2,3]))
+print('012:',calc_size([0,1,2]))
+print('013:',calc_size([0,1,3]))
+print('023:',calc_size([0,2,3]))
+print('123:',calc_size([1,2,3]))
+print('0123:',calc_size([0,1,2,3]))
+
 selected_df = df[list(selected_features) + [label_col]]
 selected_df.to_csv(f'{filepath}/selected_data.txt', index=False)
