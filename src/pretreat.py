@@ -228,7 +228,7 @@ ax8.legend()
 plt.tight_layout()
 
 # 保存图形
-plt.savefig('data_filtering_analysis.png', dpi=300, bbox_inches='tight')
+plt.savefig(f'{filepath}/../fig/data_filtering_analysis.png', dpi=300, bbox_inches='tight')
 print('\n图形已保存为: data_filtering_analysis.png')
 
 # 显示图形

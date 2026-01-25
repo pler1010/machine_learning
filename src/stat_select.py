@@ -69,7 +69,7 @@ for subtype in subtypes:
     plt.title(f'{subtype} vs Others')
     plt.tight_layout()
     
-    plt.savefig(f'{filepath}/../volcano_{subtype}.png', dpi=300, bbox_inches='tight')
+    plt.savefig(f'{filepath}/../fig/volcano_{subtype}.png', dpi=300, bbox_inches='tight')
     plt.close()
 
 # 保存选择的数据
