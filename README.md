@@ -30,8 +30,20 @@ The final project for machine learning.
 
   输出：
     ./data/selected_data.txt（供 evaluate 使用）  
-    ./data/ml_importance_scores.csv（各模型重要性+融合分数）  
+    ./data/ml_importance_scores.csv（各模型重要性+融合分数）
 
+- 执行基于深度学习的特征筛选
+
+  ```
+  python driver.py --mode dl_select -d 100 -g abs -e 30
+  ```  
+  其中 -g 表示梯度重要性计算方式，可选 abs 或 square
+  -e 表示 MLP 训练轮数
+  输出：
+    ./data/selected_data.txt（供 evaluate 使用）
+    ./data/dl_importance_scores_abs.csv（梯度重要性分数）
+    ./data/dl_vs_ml_overlap_top100.txt（与任务3重叠率分析）
+    ./fig/dl_grad_top20_abs.png 等可视化结果
 
 - 执行结果评估
 
