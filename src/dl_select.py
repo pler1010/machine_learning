@@ -12,9 +12,8 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset, DataLoader
 
 
-# =========================
+
 #  PyTorch
-# =========================
 try:
     import torch
     import torch.nn as nn
@@ -65,9 +64,9 @@ class MLPClassifier(nn.Module):
         prev = input_dim
         for h in hidden_dims:
             layers.append(nn.Linear(prev, h))
-            layers.append(nn.BatchNorm1d(h))   # ✅ BatchNorm
+            layers.append(nn.BatchNorm1d(h))   # BatchNorm
             layers.append(nn.ReLU())
-            layers.append(nn.Dropout(dropout)) # ✅ Dropout
+            layers.append(nn.Dropout(dropout)) # Dropout
             prev = h
 
         layers.append(nn.Linear(prev, num_classes))
@@ -246,7 +245,7 @@ def plot_venn_optional(set_a, set_b, save_path, label_a="ML Top100", label_b="DL
 
 def main():
     """
-    用法（driver 会传参）：
+    用法 ：
       python driver.py --mode dl_select -d 100 -g abs -e 30
 
     sys.argv:
@@ -267,7 +266,7 @@ def main():
     if not os.path.exists(clean_path):
         raise FileNotFoundError("找不到 clean_data.txt，请先运行 pretreat")
 
-    # fig目录：data/../fig
+    # fig目录
     fig_dir = os.path.join(filepath, "..", "fig")
     ensure_dir(fig_dir)
 
@@ -280,7 +279,7 @@ def main():
     y_raw = df[label_col].values
     y = LabelEncoder().fit_transform(y_raw)
 
-    # 标准化（MLP更稳）
+    # 标准化
     scaler = StandardScaler()
     X = scaler.fit_transform(X_raw).astype(np.float32)
 
@@ -301,14 +300,14 @@ def main():
     val_loader = DataLoader(GeneDataset(X_val, y_val), batch_size=256, shuffle=False)
     test_loader = DataLoader(GeneDataset(X_test, y_test), batch_size=256, shuffle=False)
 
-    # 用全体数据计算梯度重要性更合理（训练完后）
+    # 用全体数据计算梯度重要性更合理
     full_loader = DataLoader(GeneDataset(X, y), batch_size=128, shuffle=False)
 
-    # 设备
+    
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print("[DL Select] Device:", device)
 
-    # 构建 MLP（✅ Dropout + BatchNorm）
+    # 构建 MLP（Dropout + BatchNorm）
     model = MLPClassifier(
         input_dim=n_features,
         num_classes=n_classes,
@@ -341,9 +340,8 @@ def main():
     test_acc = test_correct / max(test_total, 1)
     print(f"[DL Select] Test accuracy (MLP): {test_acc:.4f}")
 
-    # ==============================
-    # ✅ 梯度重要性计算（任务4关键）
-    # ==============================
+
+    # 梯度重要性计算
     grad_importance = compute_gradient_importance(
         model, full_loader, device=device, mode=grad_mode
     )
@@ -356,7 +354,7 @@ def main():
     print(f"[DL Select] grad_mode={grad_mode}, Top{top_n} genes selected.")
     print("Top10 genes:", top_genes[:10])
 
-    # 输出 selected_data.txt（供 evaluate.py 使用）
+    # 输出 selected_data.txt
     selected_df = df[top_genes + [label_col]]
     out_path = os.path.join(filepath, "selected_data.txt")
     selected_df.to_csv(out_path, index=False)
@@ -372,9 +370,7 @@ def main():
     score_df.to_csv(score_path, index=False)
     print(f"[DL Select] Saved: {score_path}")
 
-    # ==============================
-    # ✅ 与任务3(ML)结果重叠率对比
-    # ==============================
+    # 与任务3(ML)结果重叠率对比
     ml_score_path = os.path.join(filepath, "ml_importance_scores.csv")
     if os.path.exists(ml_score_path):
         ml_df = pd.read_csv(ml_score_path)
@@ -388,7 +384,7 @@ def main():
         print(f"Jaccard = {jac:.4f}")
         print(f"Overlap ratio = {len(inter)/top_n:.4f}")
 
-        # 保存 overlap 结果表（方便写报告）
+        # 保存 overlap 结果表
         overlap_path = os.path.join(filepath, f"dl_vs_ml_overlap_top{top_n}.txt")
         with open(overlap_path, "w", encoding="utf-8") as f:
             f.write(f"ML Top{top_n} ∩ DL Top{top_n} = {len(inter)}\n")
@@ -399,15 +395,14 @@ def main():
                 f.write(g + "\n")
         print(f"[DL Select] Saved overlap report: {overlap_path}")
 
-        # 可视化：重叠条形图 & Venn
+        # 可视化
         plot_overlap_bar(len(inter), top_n, os.path.join(fig_dir, "dl_vs_ml_overlap_bar.png"))
         plot_venn_optional(ml_top, top_genes, os.path.join(fig_dir, "dl_vs_ml_venn.png"))
     else:
         print("[DL Select] 未找到 ml_importance_scores.csv（请先运行任务3：ml_select）")
 
-    # ==============================
-    # ✅ 可视化输出（任务4建议）
-    # ==============================
+    
+    # 可视化输出
     plot_top20_bar(
         feature_names,
         grad_importance_norm,
