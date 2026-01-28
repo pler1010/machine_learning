@@ -29,7 +29,9 @@ The final project for machine learning.
   该命令会训练 RandomForest 与 XGBoost 多分类模型，并根据特征重要性进行加权融合筛选 Top100 基因。其中 a 表示加权融合中 RandomForest 的权重。
 
   输出：
+    
     ./data/selected_data.txt（供 evaluate 使用）  
+    
     ./data/ml_importance_scores.csv（各模型重要性+融合分数）
 
 - 执行基于深度学习的特征筛选
@@ -43,9 +45,13 @@ The final project for machine learning.
   -e 表示 MLP 训练轮数
   
   输出：
+    
     ./data/selected_data.txt（供 evaluate 使用）
+    
     ./data/dl_importance_scores_abs.csv（梯度重要性分数）
+    
     ./data/dl_vs_ml_overlap_top100.txt（与任务3重叠率分析）
+    
     ./fig/dl_grad_top20_abs.png 等可视化结果
 
 - 执行结果评估
