@@ -82,19 +82,66 @@ def plot_rf_vs_xgb_scatter(feature_names, rf_score, xgb_score, highlight_genes, 
     plt.close()
 
 
-def plot_score_distribution(rf_score, xgb_score, final_score, save_path):
-    """重要性分布直方图"""
-    plt.figure(figsize=(10, 5))
-    plt.hist(rf_score, bins=50, alpha=0.6, label="RF(Gini)")
-    plt.hist(xgb_score, bins=50, alpha=0.6, label="XGB(mean)")
-    plt.hist(final_score, bins=50, alpha=0.6, label="Final")
-    plt.xlabel("Importance Score (normalized)")
-    plt.ylabel("Count")
-    plt.title("Importance Score Distributions")
-    plt.legend()
+
+
+def plot_score_distribution(rf_score, xgb_score, final_score, save_path,
+                            bins=80, zoom_max=0.05, eps=1e-12):
+    """
+    重要性分布直方图
+    """
+    rf_score = np.asarray(rf_score)
+    xgb_score = np.asarray(xgb_score)
+    final_score = np.asarray(final_score)
+
+    # 统一 bins 的边界，便于对齐对比
+    all_scores = np.concatenate([rf_score, xgb_score, final_score])
+    bin_edges = np.linspace(0.0, 1.0, bins + 1)
+
+    # 一些统计信息
+    def nonzero_cnt(x): return int(np.sum(x > eps))
+    def q99(x): return float(np.quantile(x, 0.99))
+
+    rf_nz, xgb_nz, fin_nz = nonzero_cnt(rf_score), nonzero_cnt(xgb_score), nonzero_cnt(final_score)
+    rf_q99, xgb_q99, fin_q99 = q99(rf_score), q99(xgb_score), q99(final_score)
+
+    fig = plt.figure(figsize=(10, 7))
+    gs = fig.add_gridspec(2, 1, height_ratios=[2, 1], hspace=0.25)
+
+    # 主图：log-y 直方图
+    ax1 = fig.add_subplot(gs[0, 0])
+    ax1.hist(rf_score, bins=bin_edges, alpha=0.45, label=f"RF(Gini)  nz={rf_nz}")
+    ax1.hist(xgb_score, bins=bin_edges, alpha=0.45, label=f"XGB(mean) nz={xgb_nz}")
+    ax1.hist(final_score, bins=bin_edges, alpha=0.45, label=f"Final     nz={fin_nz}")
+    ax1.set_yscale("log")
+    ax1.set_xlabel("Importance Score (normalized)")
+    ax1.set_ylabel("Count (log)")
+    ax1.set_title("Importance Score Distributions (log-y + zoom)")
+
+    # 标出 Top1% 分位阈值
+    ax1.axvline(rf_q99, linestyle="--", linewidth=1)
+    ax1.axvline(xgb_q99, linestyle="--", linewidth=1)
+    ax1.axvline(fin_q99, linestyle="--", linewidth=1)
+    ax1.text(0.98, 0.95,
+             f"99th pct: RF={rf_q99:.3f}, XGB={xgb_q99:.3f}, Final={fin_q99:.3f}",
+             transform=ax1.transAxes, ha="right", va="top", fontsize=9)
+
+    ax1.legend(loc="upper right")
+    ax1.grid(alpha=0.2)
+
+    # 放大图：只看 0~zoom_max
+    ax2 = fig.add_subplot(gs[1, 0], sharex=ax1)
+    ax2.hist(rf_score, bins=np.linspace(0, zoom_max, 60), alpha=0.45, label="RF(Gini)")
+    ax2.hist(xgb_score, bins=np.linspace(0, zoom_max, 60), alpha=0.45, label="XGB(mean)")
+    ax2.hist(final_score, bins=np.linspace(0, zoom_max, 60), alpha=0.45, label="Final")
+    ax2.set_xlim(0, zoom_max)
+    ax2.set_xlabel(f"Zoomed in: [0, {zoom_max}]")
+    ax2.set_ylabel("Count")
+    ax2.grid(alpha=0.2)
+
     plt.tight_layout()
     plt.savefig(save_path, dpi=300, bbox_inches="tight")
     plt.close()
+
 
 
 def jaccard_set(a, b):
