@@ -37,8 +37,11 @@ The final project for machine learning.
   ```
   python driver.py --mode dl_select -d 100 -g abs -e 30
   ```  
-  其中 -g 表示梯度重要性计算方式，可选 abs 或 square
+  
+  其中 -g 表示梯度重要性计算方式，可选 abs 或 square；
+  
   -e 表示 MLP 训练轮数
+  
   输出：
     ./data/selected_data.txt（供 evaluate 使用）
     ./data/dl_importance_scores_abs.csv（梯度重要性分数）
