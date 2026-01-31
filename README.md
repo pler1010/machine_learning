@@ -1,7 +1,29 @@
 # machine_learning
 The final project for machine learning.
 
-复现流程：
+## 环境配置
+
+本项目依赖 Python 3.8+ 环境。建议使用 conda 创建虚拟环境并安装依赖。
+
+1. 创建并激活虚拟环境：
+   ```bash
+   conda create -n ml_project python=3.9
+   conda activate ml_project
+   ```
+
+2. 安装依赖库：
+   ```bash
+   pip install -r requirements.txt
+   ```
+   
+   主要依赖包括：
+   - `scanpy`: 用于单细胞数据读取与处理
+   - `scikit-learn`: 用于机器学习模型与特征选择
+   - `xgboost`: 用于集成学习特征选择
+   - `matplotlib` & `seaborn`: 用于绘图
+   - `matplotlib-venn`: 用于绘制韦恩图 (Venn Diagram)
+
+## 复现流程：
 
 - 执行数据处理
 
